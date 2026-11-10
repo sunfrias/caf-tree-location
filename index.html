@@ -34,6 +34,8 @@
       box-shadow: 0 10px 35px rgba(0, 0, 0, 0.07);
     }
 
+    .hidden { display: none !important; }
+
     .tree-icon {
       font-size: 45px;
       margin-bottom: 12px;
@@ -182,15 +184,15 @@
       CAF · BAJO LA SOMBRA
     </div>
 
+    <section id="gpsScreen">
     <h1>
-      Registra la ubicación de tu árbol
+      ¡Gracias por completar el seguimiento de tu árbol!
     </h1>
 
     <p class="intro">
-      ¡Gracias por ser parte de Bajo la Sombra!
-      <br><br>
-      Ayúdanos a conocer dónde están creciendo
-      los árboles de nuestra comunidad.
+      Tu formulario de seguimiento ha terminado.
+      Si lo deseas, puedes compartir la ubicación GPS
+      del árbol como paso adicional y voluntario.
     </p>
 
     <div class="tree-id" id="treeDisplay">
@@ -225,6 +227,27 @@
       La ubicación precisa no se publicará en mapas públicos.
     </p>
 
+    </section>
+
+    <section id="completeScreen" class="hidden" aria-live="polite">
+      <h1>🌱 ¡Gracias por participar!</h1>
+      <p id="completionMessage" class="intro"></p>
+      <div class="tree-id" id="completeTreeId"></div>
+      <h2 style="font-size:19px;color:#123f32">¿Recibiste más de un árbol?</h2>
+      <p class="instruction">
+        📱 <strong>Escanea el código QR del próximo árbol</strong>
+        para completar su propio formulario. Cada árbol tiene
+        un código QR único. <strong>No reutilices el enlace
+        de otro árbol.</strong>
+      </p>
+      <p class="instruction">Si ya terminaste, ¡gracias por ayudar a cuidar nuestros árboles!</p>
+      <a id="cafWebsiteLink" class="primary"
+         style="display:block;text-decoration:none;border-radius:11px;padding:17px 12px;font-size:15px;font-weight:bold;"
+         href="#" target="_blank" rel="noopener noreferrer">
+        💚 Visitar el sitio web de CAF
+      </a>
+    </section>
+
     <footer>
       Centro de Apoyo Familiar
       <br>
@@ -249,6 +272,9 @@
     const SCRIPT_URL =
       "https://script.google.com/macros/s/AKfycbx6uWWel0uhL9G_ahTo1FTBm4LEi2tlpyFu-tolTA0qoI8k8U9uM4Qmk_qKMR4sz-oQTw/exec";
   
+    // IMPORTANT: Replace with CAF's confirmed official website before launch.
+    const CAF_WEBSITE_URL = "";
+
     const params =
       new URLSearchParams(window.location.search);
 
@@ -264,6 +290,24 @@
 
     let submitting = false;
     let registered = false;
+
+    function showCompletion(gpsSaved) {
+      document.getElementById("gpsScreen").classList.add("hidden");
+      document.getElementById("completeScreen").classList.remove("hidden");
+      document.getElementById("completeTreeId").textContent =
+        treeId ? "Árbol: " + treeId : "Bajo la Sombra";
+      document.getElementById("completionMessage").textContent = gpsSaved
+        ? "✅ La ubicación GPS de tu árbol se guardó correctamente."
+        : "Tu seguimiento ha finalizado. No compartiste tu ubicación GPS, y está perfectamente bien.";
+      window.scrollTo(0, 0);
+    }
+
+    const cafLink = document.getElementById("cafWebsiteLink");
+    if (CAF_WEBSITE_URL) {
+      cafLink.href = CAF_WEBSITE_URL;
+    } else {
+      cafLink.classList.add("hidden");
+    }
 
     // Display Tree ID automatically.
     if (treeId) {
@@ -636,6 +680,7 @@
               locationButton.textContent =
                 "✅ Ubicación registrada";
 
+              showCompletion(true);
               return;
             }
 
@@ -722,13 +767,8 @@
 
     // Participant declines GPS sharing.
     function declineLocation() {
-
-      showStatus(
-        "🌱 Gracias por participar en Bajo la Sombra. " +
-        "Puedes continuar sin compartir tu ubicación.",
-        "info"
-      );
-
+      if (submitting || registered) return;
+      showCompletion(false);
     }
 
   </script>
