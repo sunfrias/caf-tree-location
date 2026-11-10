@@ -272,8 +272,7 @@
     const SCRIPT_URL =
       "https://script.google.com/macros/s/AKfycbx6uWWel0uhL9G_ahTo1FTBm4LEi2tlpyFu-tolTA0qoI8k8U9uM4Qmk_qKMR4sz-oQTw/exec";
   
-    // IMPORTANT: Replace with CAF's confirmed official website before launch.
-    const CAF_WEBSITE_URL = "";
+    const CAF_WEBSITE_URL = "https://www.mycaf.org/";
 
     const params =
       new URLSearchParams(window.location.search);
@@ -568,12 +567,13 @@
         return;
       }
 
-      // Match the Apps Script test-mode restriction.
-      if (treeId !== "CAF-BLS-TEST001") {
+      // Accept CAF production labels (six digits) and the existing test label.
+      // The Apps Script backend independently validates the same format.
+      if (!/^CAF-BLS-\d{6}$/.test(treeId) && treeId !== "CAF-BLS-TEST001") {
 
         showStatus(
-          "Este identificador todavía no está habilitado. " +
-          "El sistema se encuentra en modo de prueba.",
+          "El identificador del árbol no tiene un formato válido. " +
+          "Escanea el código QR de la etiqueta de tu árbol.",
           "error"
         );
 
